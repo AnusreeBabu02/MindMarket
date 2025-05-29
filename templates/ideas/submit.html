@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Submit Idea - MindMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h2 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Submit Your Creative Idea</h2>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="title" class="form-label">Idea Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required 
+                                   placeholder="Give your idea a catchy, descriptive title">
+                            <div class="form-text">Make it memorable and searchable</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="category" class="form-label">Category</label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="app_names">App Names</option>
+                                <option value="taglines">Marketing Taglines</option>
+                                <option value="product_pitches">Product Pitches</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required
+                                      placeholder="Describe your idea in detail. Include context, target audience, and why it's valuable."></textarea>
+                            <div class="form-text">Be detailed but concise. This helps buyers understand your idea's value.</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="price" class="form-label">Starting Price (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="price" name="price" 
+                                       min="1" step="0.01" required placeholder="25.00">
+                            </div>
+                            <div class="form-text">Set your minimum acceptable price. Buyers can bid higher.</div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>AI Analysis:</strong> After submission, our AI will automatically analyze your idea for creativity, marketability, and commercial potential. This helps buyers discover ideas that match their needs.
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i>Submit Idea
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tips Section -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Tips for Success</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Use clear, descriptive titles that capture the essence of your idea</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Provide detailed descriptions that explain the value proposition</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Research similar ideas to price competitively</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Choose the right category to help buyers find your idea</li>
+                        <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Be original - plagiarized ideas will be rejected</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

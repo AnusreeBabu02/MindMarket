@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Sell Your Creative Ideas</h1>
+                <p class="lead mb-4">MindMarket is the premier marketplace for creative minds to monetize their ideas. Submit app names, taglines, product pitches, and more.</p>
+                <div class="d-flex gap-3">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('submit_idea') }}" class="btn btn-light btn-lg">Submit Your Idea</a>
+                    {% else %}
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg">Get Started</a>
+                    {% endif %}
+                    <a href="{{ url_for('browse_ideas') }}" class="btn btn-outline-light btn-lg">Browse Ideas</a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="fas fa-lightbulb" style="font-size: 10rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">How MindMarket Works</h2>
+            <p class="text-muted">Simple steps to turn your creativity into profit</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-upload"></i>
+                    </div>
+                    <h4>Submit Ideas</h4>
+                    <p class="text-muted">Upload your creative ideas with descriptions and set your price. Our AI will automatically rank and categorize them.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h4>AI Analysis</h4>
+                    <p class="text-muted">Advanced AI analyzes your ideas for marketability, creativity, and commercial potential to help buyers find the best matches.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <h4>Bidding Wars</h4>
+                    <p class="text-muted">Buyers compete for your ideas through our bidding system. Accept the best offer and get paid instantly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold text-white">Idea Categories</h2>
+            <p class="text-muted">What type of ideas are you looking for?</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-mobile-alt fa-3x mb-3"></i>
+                        <h4>App Names</h4>
+                        <p>Creative and memorable names for mobile apps, web applications, and software products.</p>
+                        <a href="{{ url_for('browse_ideas', category='app_names') }}" class="btn btn-outline-light">Browse App Names</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-bullhorn fa-3x mb-3"></i>
+                        <h4>Marketing Taglines</h4>
+                        <p>Catchy slogans and taglines that capture brand essence and drive customer engagement.</p>
+                        <a href="{{ url_for('browse_ideas', category='taglines') }}" class="btn btn-outline-light">Browse Taglines</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card h-100 bg-secondary text-white">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x mb-3"></i>
+                        <h4>Product Pitches</h4>
+                        <p>Innovative product concepts and business ideas ready for development or investment.</p>
+                        <a href="{{ url_for('browse_ideas', category='product_pitches') }}" class="btn btn-outline-light">Browse Pitches</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Ideas Section -->
+{% if featured_ideas %}
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Top Rated Ideas</h2>
+            <a href="{{ url_for('browse_ideas', sort='rating') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="row g-4">
+            {% for idea in featured_ideas %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-primary">{{ idea.category.replace('_', ' ').title() }}</span>
+                            <div class="text-warning">
+                                {% for i in range(5) %}
+                                    <i class="fas fa-star{% if loop.index0 >= (idea.ai_rating / 2) %} text-muted{% endif %}"></i>
+                                {% endfor %}
+                                <small class="text-muted ms-1">{{ "%.1f"|format(idea.ai_rating) }}</small>
+                            </div>
+                        </div>
+                        <h5 class="card-title">{{ idea.title }}</h5>
+                        <p class="card-text text-muted">{{ idea.description[:100] }}{% if idea.description|length > 100 %}...{% endif %}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-success mb-0">${{ "%.2f"|format(idea.price) }}</span>
+                            <a href="{{ url_for('idea_detail', id=idea.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Recent Ideas Section -->
+{% if recent_ideas %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Latest Ideas</h2>
+            <a href="{{ url_for('browse_ideas') }}" class="btn btn-outline-primary">View All</a>
+        </div>
+        
+        <div class="row g-4">
+            {% for idea in recent_ideas %}
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <span class="badge bg-secondary">{{ idea.category.replace('_', ' ').title() }}</span>
+                            <small class="text-muted">{{ idea.created_at.strftime('%b %d') }}</small>
+                        </div>
+                        <h5 class="card-title">{{ idea.title }}</h5>
+                        <p class="card-text text-muted">{{ idea.description[:100] }}{% if idea.description|length > 100 %}...{% endif %}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="h5 text-success mb-0">${{ "%.2f"|format(idea.price) }}</span>
+                            <a href="{{ url_for('idea_detail', id=idea.id) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA Section -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-4">Ready to Monetize Your Creativity?</h2>
+        <p class="lead mb-4">Join thousands of creative minds earning money from their ideas</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg me-3">Join MindMarket</a>
+        {% endif %}
+        <a href="{{ url_for('browse_ideas') }}" class="btn btn-outline-light btn-lg">Explore Ideas</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Ideas - MindMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h1><i class="fas fa-search me-2"></i>Browse Ideas</h1>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('submit_idea') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Submit Idea
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search" name="search" 
+                           value="{{ current_search }}" placeholder="Search ideas...">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        <option value="app_names" {% if current_category == 'app_names' %}selected{% endif %}>App Names</option>
+                        <option value="taglines" {% if current_category == 'taglines' %}selected{% endif %}>Marketing Taglines</option>
+                        <option value="product_pitches" {% if current_category == 'product_pitches' %}selected{% endif %}>Product Pitches</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="sort" class="form-label">Sort By</label>
+                    <select class="form-select" id="sort" name="sort">
+                        <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                        <option value="rating" {% if current_sort == 'rating' %}selected{% endif %}>Highest Rated</option>
+                        <option value="price_low" {% if current_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="price_high" {% if current_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                    </select>
+                </div>
+                
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Results -->
+    {% if ideas.items %}
+    <div class="row g-4">
+        {% for idea in ideas.items %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-primary">{{ idea.category.replace('_', ' ').title() }}</span>
+                        {% if idea.ai_rating %}
+                        <div class="text-warning">
+                            {% for i in range(5) %}
+                                <i class="fas fa-star{% if loop.index0 >= (idea.ai_rating / 2) %} text-muted{% endif %}"></i>
+                            {% endfor %}
+                            <small class="text-muted ms-1">{{ "%.1f"|format(idea.ai_rating) }}</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <h5 class="card-title">{{ idea.title }}</h5>
+                    <p class="card-text text-muted">{{ idea.description[:120] }}{% if idea.description|length > 120 %}...{% endif %}</p>
+                    
+                    <div class="mb-2">
+                        <small class="text-muted">by {{ idea.owner.username }}</small>
+                        {% if idea.ai_cluster %}
+                        <span class="badge bg-secondary ms-2">{{ idea.ai_cluster }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="h5 text-success mb-0">${{ "%.2f"|format(idea.price) }}</span>
+                            {% if idea.get_bid_count() > 0 %}
+                            <br><small class="text-muted">{{ idea.get_bid_count() }} bid{% if idea.get_bid_count() != 1 %}s{% endif %}</small>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="{{ url_for('idea_detail', id=idea.id) }}" class="btn btn-outline-primary btn-sm">View Details</a>
+                            {% if current_user.is_authenticated and current_user.id != idea.user_id and not idea.is_sold %}
+                            <a href="{{ url_for('place_bid', idea_id=idea.id) }}" class="btn btn-success btn-sm">Bid</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if ideas.pages > 1 %}
+    <nav aria-label="Ideas pagination" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if ideas.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('browse_ideas', page=ideas.prev_num, category=current_category, search=current_search, sort=current_sort) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in ideas.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != ideas.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('browse_ideas', page=page_num, category=current_category, search=current_search, sort=current_sort) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if ideas.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('browse_ideas', page=ideas.next_num, category=current_category, search=current_search, sort=current_sort) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+    
+    {% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h3>No Ideas Found</h3>
+        <p class="text-muted">Try adjusting your search criteria or browse all categories.</p>
+        <a href="{{ url_for('browse_ideas') }}" class="btn btn-primary">View All Ideas</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

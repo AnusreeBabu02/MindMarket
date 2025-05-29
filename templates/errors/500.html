@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error - MindMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center mt-5">
+            <i class="fas fa-exclamation-triangle fa-5x text-warning mb-4"></i>
+            <h1 class="display-4">500</h1>
+            <h2>Server Error</h2>
+            <p class="lead">Something went wrong on our end. Please try again later.</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Go Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

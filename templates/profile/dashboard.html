@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - MindMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h1><i class="fas fa-tachometer-alt me-2"></i>Dashboard</h1>
+        <a href="{{ url_for('submit_idea') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Submit New Idea
+        </a>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-lightbulb fa-2x text-primary mb-2"></i>
+                    <h3 class="mb-0">{{ user_ideas|length }}</h3>
+                    <small class="text-muted">Ideas Submitted</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-gavel fa-2x text-success mb-2"></i>
+                    <h3 class="mb-0">{{ user_bids|length }}</h3>
+                    <small class="text-muted">Bids Placed</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-shopping-cart fa-2x text-info mb-2"></i>
+                    <h3 class="mb-0">{{ purchases|length }}</h3>
+                    <small class="text-muted">Ideas Purchased</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-dollar-sign fa-2x text-warning mb-2"></i>
+                    <h3 class="mb-0">{{ sales|length }}</h3>
+                    <small class="text-muted">Ideas Sold</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tabs -->
+    <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="ideas-tab" data-bs-toggle="tab" data-bs-target="#ideas" type="button" role="tab">
+                My Ideas
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="bids-tab" data-bs-toggle="tab" data-bs-target="#bids" type="button" role="tab">
+                My Bids
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="purchases-tab" data-bs-toggle="tab" data-bs-target="#purchases" type="button" role="tab">
+                Purchases
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="sales-tab" data-bs-toggle="tab" data-bs-target="#sales" type="button" role="tab">
+                Sales
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="dashboardTabsContent">
+        <!-- My Ideas Tab -->
+        <div class="tab-pane fade show active" id="ideas" role="tabpanel">
+            <div class="py-4">
+                {% if user_ideas %}
+                <div class="row g-4">
+                    {% for idea in user_ideas %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-primary">{{ idea.category.replace('_', ' ').title() }}</span>
+                                    {% if idea.is_sold %}
+                                    <span class="badge bg-success">SOLD</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">ACTIVE</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <h5 class="card-title">{{ idea.title }}</h5>
+                                <p class="card-text text-muted">{{ idea.description[:100] }}{% if idea.description|length > 100 %}...{% endif %}</p>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="h6 text-success">${{ "%.2f"|format(idea.price) }}</span>
+                                        {% if idea.get_bid_count() > 0 %}
+                                        <br><small class="text-muted">{{ idea.get_bid_count() }} bid{% if idea.get_bid_count() != 1 %}s{% endif %}</small>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('idea_detail', id=idea.id) }}" class="btn btn-outline-primary btn-sm">View</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-lightbulb fa-3x text-muted mb-3"></i>
+                    <h3>No Ideas Yet</h3>
+                    <p class="text-muted">Start sharing your creative ideas with the world!</p>
+                    <a href="{{ url_for('submit_idea') }}" class="btn btn-primary">Submit Your First Idea</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- My Bids Tab -->
+        <div class="tab-pane fade" id="bids" role="tabpanel">
+            <div class="py-4">
+                {% if user_bids %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Idea</th>
+                                <th>Bid Amount</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bid in user_bids %}
+                            <tr>
+                                <td>
+                                    <strong>{{ bid.idea.title }}</strong>
+                                    <br><small class="text-muted">{{ bid.idea.category.replace('_', ' ').title() }}</small>
+                                </td>
+                                <td class="h6 text-success">${{ "%.2f"|format(bid.amount) }}</td>
+                                <td>
+                                    {% if bid.is_accepted %}
+                                    <span class="badge bg-success">Accepted</span>
+                                    {% elif bid.idea.is_sold %}
+                                    <span class="badge bg-danger">Lost</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ bid.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <a href="{{ url_for('idea_detail', id=bid.idea.id) }}" class="btn btn-outline-primary btn-sm">View Idea</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-gavel fa-3x text-muted mb-3"></i>
+                    <h3>No Bids Yet</h3>
+                    <p class="text-muted">Start bidding on ideas that interest you!</p>
+                    <a href="{{ url_for('browse_ideas') }}" class="btn btn-primary">Browse Ideas</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Purchases Tab -->
+        <div class="tab-pane fade" id="purchases" role="tabpanel">
+            <div class="py-4">
+                {% if purchases %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Idea</th>
+                                <th>Seller</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in purchases %}
+                            <tr>
+                                <td>
+                                    <strong>{{ transaction.idea.title }}</strong>
+                                    <br><small class="text-muted">{{ transaction.idea.category.replace('_', ' ').title() }}</small>
+                                </td>
+                                <td>{{ transaction.seller.username }}</td>
+                                <td class="h6 text-success">${{ "%.2f"|format(transaction.amount) }}</td>
+                                <td>{{ transaction.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if transaction.status == 'completed' else 'warning' }}">
+                                        {{ transaction.status.title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                    <h3>No Purchases Yet</h3>
+                    <p class="text-muted">Browse and bid on ideas to get started!</p>
+                    <a href="{{ url_for('browse_ideas') }}" class="btn btn-primary">Browse Ideas</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Sales Tab -->
+        <div class="tab-pane fade" id="sales" role="tabpanel">
+            <div class="py-4">
+                {% if sales %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Idea</th>
+                                <th>Buyer</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in sales %}
+                            <tr>
+                                <td>
+                                    <strong>{{ transaction.idea.title }}</strong>
+                                    <br><small class="text-muted">{{ transaction.idea.category.replace('_', ' ').title() }}</small>
+                                </td>
+                                <td>{{ transaction.buyer.username }}</td>
+                                <td class="h6 text-success">${{ "%.2f"|format(transaction.amount) }}</td>
+                                <td>{{ transaction.created_at.strftime('%b %d, %Y') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if transaction.status == 'completed' else 'warning' }}">
+                                        {{ transaction.status.title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-dollar-sign fa-3x text-muted mb-3"></i>
+                    <h3>No Sales Yet</h3>
+                    <p class="text-muted">Submit great ideas and accept bids to start earning!</p>
+                    <a href="{{ url_for('submit_idea') }}" class="btn btn-primary">Submit an Idea</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

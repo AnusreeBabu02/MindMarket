@@ -1,0 +1,224 @@
+/* Custom styles for MindMarket */
+
+:root {
+    --mindmarket-primary: 210 11% 98%; /* #F5F7FA */
+    --mindmarket-secondary: 220 14% 96%; /* #F1F3F7 */
+    --mindmarket-accent: 207 90% 54%; /* #1e90ff */
+}
+
+/* Utility classes */
+.sticky-top {
+    top: 1rem;
+}
+
+/* Card enhancements */
+.card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge customizations */
+.badge {
+    font-weight: 500;
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Star ratings */
+.text-warning .fas.fa-star {
+    color: #ffc107 !important;
+}
+
+.text-warning .fas.fa-star.text-muted {
+    color: #6c757d !important;
+}
+
+/* Hero section enhancements */
+.bg-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #0056b3 100%) !important;
+}
+
+/* Navigation enhancements */
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.navbar-brand i {
+    color: #ffd700;
+}
+
+/* Footer styling */
+footer {
+    border-top: 1px solid var(--bs-border-color);
+    margin-top: auto;
+}
+
+/* Form enhancements */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Table enhancements */
+.table td {
+    vertical-align: middle;
+}
+
+/* Alert customizations */
+.alert {
+    border: none;
+    border-left: 4px solid;
+}
+
+.alert-success {
+    border-left-color: var(--bs-success);
+}
+
+.alert-danger {
+    border-left-color: var(--bs-danger);
+}
+
+.alert-info {
+    border-left-color: var(--bs-info);
+}
+
+.alert-warning {
+    border-left-color: var(--bs-warning);
+}
+
+/* Loading states */
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.btn.loading::after {
+    content: "";
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-left: 0.5rem;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .display-4 {
+        font-size: 2rem;
+    }
+}
+
+/* Dark theme adjustments */
+[data-bs-theme="dark"] .card {
+    border-color: rgba(255, 255, 255, 0.125);
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--bs-dark) !important;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Idea card specific styling */
+.idea-card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.idea-card:hover {
+    border-color: var(--bs-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Bidding specific styles */
+.bid-amount {
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.bid-status {
+    font-size: 0.875rem;
+}
+
+/* Profile dashboard enhancements */
+.stats-card {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #0056b3 100%);
+    color: white;
+    border: none;
+}
+
+.stats-card .card-body {
+    padding: 2rem 1rem;
+}
+
+/* Search and filter improvements */
+.filter-card {
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+}
+
+/* Pagination styling */
+.pagination .page-link {
+    color: var(--bs-primary);
+    border-color: var(--bs-border-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+}
+
+.pagination .page-link:hover {
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}

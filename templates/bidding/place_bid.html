@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Place Bid - {{ idea.title }} - MindMarket{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Idea Summary -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="mb-0"><i class="fas fa-gavel me-2"></i>Place Your Bid</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <span class="badge bg-primary mb-2">{{ idea.category.replace('_', ' ').title() }}</span>
+                            <h4>{{ idea.title }}</h4>
+                            <p class="text-muted">{{ idea.description[:200] }}{% if idea.description|length > 200 %}...{% endif %}</p>
+                            <small class="text-muted">by {{ idea.owner.username }}</small>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="mb-2">
+                                <small class="text-muted">Starting Price</small>
+                                <div class="h4 text-success">${{ "%.2f"|format(idea.price) }}</div>
+                            </div>
+                            {% if idea.get_highest_bid() %}
+                            <div>
+                                <small class="text-muted">Current Highest Bid</small>
+                                <div class="h4 text-primary">${{ "%.2f"|format(idea.get_highest_bid().amount) }}</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Bid Form -->
+            <div class="card mt-4">
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-4">
+                            <label for="amount" class="form-label">Bid Amount (USD)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       min="{{ idea.get_highest_bid().amount + 0.01 if idea.get_highest_bid() else idea.price }}" 
+                                       step="0.01" required 
+                                       placeholder="{{ '%.2f'|format(idea.get_highest_bid().amount + 5 if idea.get_highest_bid() else idea.price + 5) }}">
+                            </div>
+                            <div class="form-text">
+                                {% if idea.get_highest_bid() %}
+                                Your bid must be higher than ${{ "%.2f"|format(idea.get_highest_bid().amount) }}
+                                {% else %}
+                                Your bid must be at least ${{ "%.2f"|format(idea.price) }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Message to Seller (Optional)</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" 
+                                      placeholder="Tell the seller why you want this idea or ask any questions..."></textarea>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>How bidding works:</strong>
+                            <ul class="mb-0 mt-2">
+                                <li>Your bid is immediately visible to the seller</li>
+                                <li>The seller can accept your bid at any time</li>
+                                <li>You can be outbid by other buyers</li>
+                                <li>If your bid is accepted, the transaction will be processed</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('idea_detail', id=idea.id) }}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-gavel me-2"></i>Place Bid
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Bidding Tips -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Bidding Tips</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Research similar ideas to understand market value</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Consider the seller's reputation and previous sales</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Include a thoughtful message to stand out from other bidders</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i>Bid what the idea is truly worth to you</li>
+                        <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i>Act quickly on ideas you really want - others might bid too</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <div class="card mt-4 sticky-top">
+                <div class="card-header">
+                    <h5 class="mb-0">Bidding Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <h3 class="text-primary">{{ idea.get_bid_count() }}</h3>
+                        <small class="text-muted">Total Bids</small>
+                    </div>
+                    
+                    {% if idea.bids %}
+                    <h6>Recent Bids</h6>
+                    {% for bid in idea.bids[:3] %}
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <strong>${{ "%.2f"|format(bid.amount) }}</strong>
+                            <br><small class="text-muted">{{ bid.bidder.username }}</small>
+                        </div>
+                        <small class="text-muted">{{ bid.created_at.strftime('%b %d') }}</small>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
